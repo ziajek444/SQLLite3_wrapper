@@ -263,19 +263,52 @@ class TestDBFeature(TestCase):
                 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z',
                 ';', ':', '<', '>', '/', '?', 'X', 'C', 'V', 'B',
                 'N', 'M', ',', '.']
-        def conv_10_64(ten:int) -> str:
+        def conv_10_64(ten:int, min_str_len:int=1) -> str:
             ret = ""
             tmp_l = llll
             ombre = ten
             if ombre == 0:
                 return '0'
-            while(ombre != 0):
+            while ombre != 0:
                 ret = tmp_l[ombre & 0x3f] + ret
                 ombre = ombre >> 6
+            if len(ret) < min_str_len:
+                ret = (min_str_len-len(ret))*'0' + ret
 
             return ret
 
         e = 0xEEEFFEEEFF11EEEFFEEEFF11
-        print(conv_10_64(e), hex(e)[2:])
+        mul = 0x32+0x64
+        num = 0xff
+        for n in range(10, 20):
+            num += (mul * n*0x100)
+            print(conv_10_64(num, 16), num)
+            mul *= 0x32+0x64
+        #print(conv_10_64(e), hex(e)[2:])
+        #print(conv_10_64(e, 20), hex(e)[2:])
+        #print(conv_10_64(e, 40), hex(e)[2:])
         self.assertEqual(1, 1)
 
+    def test_conv_64_10(self):
+        llll = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                '!', '@', '#', '$', '%', '^', '&', '*', '(', ')',
+                'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+                '}', ']', '{', '[', '|', '\\', '+', '_', '=', '-',
+                'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z',
+                ';', ':', '<', '>', '/', '?', 'X', 'C', 'V', 'B',
+                'N', 'M', ',', '.']
+        def conv_64_10(sf:str) -> int:
+            assert(isinstance(sf, str))
+            ret = 0
+            mul = 64
+            gain = 1
+            tmp_sf = sf[::-1]
+            ll = "".join(llll)
+            for e in tmp_sf:
+                ret += gain * ll.find(e)
+                gain *= mul
+            return ret
+
+        e = "BJ.,BKN*BJ.,BKN*"
+        print(conv_64_10(e), int("eeeffeeeff11eeeffeeeff11", 16))
+        self.assertEqual(conv_64_10(e), int("eeeffeeeff11eeeffeeeff11", 16))
