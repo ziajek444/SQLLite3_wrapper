@@ -1,88 +1,141 @@
-from simplite import *
-import os
+from tkinter import *
+from tkinter import ttk
+from PIL import Image, ImageTk
+from mytkentry.plpostalcodeentry import EntryPostalCode_builder
+from mytkentry.tkautocomplete import Autocomplete
 
+# huge dict with cities of Poland
+from built_source.miasta_baza import dict_cities
+from built_source.gminy_baza import dict_boroughs
 
-if __name__ == '__main__':
-    os.remove("baza1.db")
-    db = Pylite("baza1.db")
+root = Tk()
+root.minsize(600, 400)
+root.title("Tab Widget")
 
-    # Add table
-    # first argument is table name.
-    # other arguments have to be labeled names equal to data type.for example title="text" or id="int"
-    # def add_table(self, table_name, **columns):
-    db.add_table("Pracownik", id="integer", name="text", surname="text", salary="real")
+print(root.keys())
+root['background'] = 'red1'
+root['borderwidth']=8
 
+s = ttk.Style()
+#theme_list = list(s.theme_names())
+theme_names_editable = ['winnative', 'clam', 'alt', 'default', 'classic']
+#print(s.theme_names())
 
-    # insert data
-    # first argument is table name
-    # other arguments have to be a list of args of table column.
-    # def insert(self, table_name, *data):
-    db.insert("Pracownik", "1", "Marcin", "Ziajkowski", "40000000.0")
-    db.insert("Pracownik", "2", "Kamil", "Stoch", "10000000.0003")
-    db.insert("Pracownik", "3", "Damian", "Jakimowocz", "41.010003")
-    db.insert("Pracownik", "3", "Jurek", "Kamiński", "4100.0")
-    db.insert("Pracownik", "4", "Kaczor", "Donald", "1000000000.1000300040005")
-
-
-    # get items from db
-    # first argument is table name
-    # second argument is condition
-    # def get_items(self, table_name, where=1):
-    print("GET before change:")
-    print(db.get_items("Pracownik"))
-
-
-    # remove items
-    # first argument is table name
-    # second argument is condition
-    # def remove(self, table_name, where="1"):
-    db.remove("Pracownik", 'name="Damian"')
-
-
-    # update items values
-    # first argument is table name
-    # second argument is condition
-    # third argument is dictionary of table column names and values
-    # def update(self, table_name, where, **columns):
-    db.update("Pracownik", 'name="Kaczor"', surname="Tusk")
-
-
-    print("GET after change:")
-    print(db.get_items("Pracownik"))
-
-    print("GET id=3:")
-    print(db.get_items("Pracownik", 'id="3"'))
-
-    db.insert("Pracownik", "10", "Amazon", "Dukat", "100.0")
-    db.insert("Pracownik", "11", "Amroży", "Funt", "0.0")
-    db.insert("Pracownik", "12", "Ambiwalentny", "Goryl", "31.1")
-    db.insert("Pracownik", "13", "Ambasador", "Rubel", "41.5")
-    print("filtered get:")
-    print(db.get_filtered_items("Pracownik", id=1, name="Am", salary="0"))
-
-    print("Get table info")
-    print(db.get_colummns("Pracownik"))
-
-    db.close_connection()
-
-'''
-    print("Maria")
-    maria = LocalDB("Klient", "ID", "name", "surname", "company", "referal")
-    print(f"columns in {maria.get_table_name()}")
-    print(maria.get_columns())
-
-    maria.add_item(name="Gruby", surname="Nik", ID=90, referal="123-234", company="Coca-Cola")
-    maria.add_item(name="Hudy", surname="Kapelusznik", ID=23, referal="124-024", company="Pepszi")
-    maria.add_item(name="Gargamel", ID=2, referal="111-000")
-
-    dupa = {"name": "Dzidek", "surname": "Dziobalski", "ID": 34, "referal": "125-356"}
-    maria.add_item(**dupa)
+for e in theme_names_editable:
+    s.theme_use(e)
+    s.configure('TNotebook', tabposition='wn', background="black")  # 'ne' as in compass direction
+    s.configure('TNotebook.Tab', background='green4')  # 'ne' as in compass direction
+    s.map("TNotebook.Tab", background=[("disabled", "black"), ("selected", "green3")], foreground=[("disabled", "white")])
 
 
 
-    print(maria.get_items())
-'''
+tabControl = ttk.Notebook(root, height=0, padding=5, width=400)
+print(tabControl.keys())
 
 
 
+tab_desc = ttk.Label(tabControl)
+im_PI_desc_tab = ImageTk.PhotoImage(Image.open('assets/asd.bmp'))
+tabControl.add(tab_desc, text='Tabs', image=im_PI_desc_tab, compound="left", state="disabled")
 
+main_tab = ttk.LabelFrame(tabControl, text="content")
+im_PI_main_tab = ImageTk.PhotoImage(Image.open('assets/asd2.bmp'))
+tabControl.add(main_tab, image=im_PI_main_tab, text='Main tab', compound="left")
+
+doc1_tab = ttk.LabelFrame(tabControl, text="asd")
+im_PI_doc1_tab = ImageTk.PhotoImage(Image.open('assets/asd.bmp'))
+tabControl.add(doc1_tab, image=im_PI_doc1_tab, text='Doc 1', compound="left")
+
+doc2_tab = ttk.LabelFrame(tabControl, text="kupa")
+im_PI_doc2_tab = ImageTk.PhotoImage(Image.open('assets/asd2.bmp'))
+tabControl.add(doc2_tab, image=im_PI_doc2_tab, text="Doc 2", compound="left")
+
+
+
+tabControl.pack(expand=1, fill=BOTH)
+
+
+index=0
+def kolacz():
+    global index
+    tll = len(theme_names_editable)
+    print(theme_names_editable[index % tll])
+    s.theme_use(theme_names_editable[index % tll])
+    #s.configure('TNotebook', tabposition='wn')
+    index+=1
+
+in_fr = LabelFrame(doc1_tab, text="hermes")
+
+b1 = ttk.Button(main_tab, text="elo 1")
+b1.pack()
+b2 = ttk.Button(in_fr, text="elo 2", command=kolacz).pack()
+b3 = ttk.Button(in_fr, text="elo 3").pack()
+b4 = ttk.Button(doc2_tab, text="elo 4").pack()
+
+main_tab_header = LabelFrame(main_tab, text="dane klienta")
+# - - - - - - - - - - - -
+header_fname_frame = Frame(main_tab_header)
+header_fname_label = Label(header_fname_frame, text="imie").pack(side=LEFT)
+username = StringVar()
+header_fname_box = Autocomplete(header_fname_frame, textvariable=username, options=['Franek', 'Marek', 'Zdzisiek'])
+header_fname_box.pack(side=RIGHT)
+header_fname_frame.grid(column=1, row=1)
+# - - - - - - - - - - - -
+header_sname_frame = Frame(main_tab_header)
+header_sname_label = Label(header_sname_frame, text="nazwisko").pack(side=LEFT)
+usersurname = StringVar()
+header_sname_box = Entry(header_sname_frame, textvariable=usersurname).pack(side=RIGHT)
+header_sname_frame.grid(column=2, row=1)
+# - - - - - - - - - - - -
+header_pesel_frame = Frame(main_tab_header)
+header_pesel_label = Label(header_pesel_frame, text="pesel").pack(side=LEFT)
+telephone = StringVar()
+header_pesel_box = Entry(header_pesel_frame, textvariable=telephone, width=12).pack(side=RIGHT)
+header_pesel_frame.grid(column=3, row=1)
+# - - - - - - - - - - - -
+header_tel_frame = Frame(main_tab_header)
+header_tel_label = Label(header_tel_frame, text="telefon").pack(side=LEFT)
+telephone = StringVar()
+header_tel_box = Entry(header_tel_frame, textvariable=telephone, width=15).pack(side=RIGHT)
+header_tel_frame.grid(column=4, row=1)
+# - - - - - - - - - - - -
+header_code_frame = Frame(main_tab_header)
+header_code_label = Label(header_code_frame, text="kod pocztowy").pack(side=LEFT)
+header_code_box = EntryPostalCode_builder(header_code_frame)
+header_code_box.pack(side=RIGHT)
+header_code_frame.grid(column=1, row=2)
+# - - - - - - - - - - - -
+header_city_frame = Frame(main_tab_header)
+header_city_label = Label(header_city_frame, text="miasto").pack(side=LEFT)
+city = StringVar()
+header_city_box = Autocomplete(header_city_frame, options=dict_cities, textvariable=city)
+header_city_box.pack(side=RIGHT)
+header_city_frame.grid(column=2, row=2)
+# - - - - - - - - - - - -
+header_borough_frame = Frame(main_tab_header)
+header_borough_label = Label(header_borough_frame, text="gmina").pack(side=LEFT)
+borough = StringVar()
+header_borough_box = Autocomplete(header_borough_frame, options=dict_boroughs, textvariable=borough)
+header_borough_box.pack(side=RIGHT)
+header_borough_frame.grid(column=3, row=2)
+# - - - - - - - - - - - -
+header_street_frame = Frame(main_tab_header)
+header_street_label = Label(header_street_frame, text="ulica").pack(side=LEFT)
+telephone = StringVar()
+header_street_box = Entry(header_street_frame, textvariable=telephone).pack(side=RIGHT)
+header_street_frame.grid(column=4, row=2)
+# - - - - - - - - - - - -
+def elo1():
+    #header_city_box["completevalues"] = dict_cities["sz"]
+    print(header_code_box.get())
+
+def elo2():
+    print(header_fname_box.get())
+
+b1["command"] = elo1
+
+
+main_tab_header.pack()
+in_fr.pack()
+
+root.mainloop()
