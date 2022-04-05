@@ -4,6 +4,8 @@
 from openpyxl import load_workbook
 from openpyxl import Workbook
 
+FILENAME = 'wykaz_stan_na_1.1.2019.xlsx'
+
 def filter_cond_city_name(value):
     if value is None:
         return False
@@ -19,7 +21,7 @@ def clean_garbage(city_name):
         city_name = city_name.replace("-", "", city_name.count("-") - 1)  # - vs -
     return city_name
 
-wb = load_workbook(filename ='wykaz_stan_na_1.1.2019.xlsx')
+wb = load_workbook(filename = FILENAME)
 sheet_ranges = wb['Arkusz1']
 unq_set = set()
 iterator = 0
